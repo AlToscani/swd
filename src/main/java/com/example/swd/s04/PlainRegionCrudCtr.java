@@ -17,129 +17,136 @@ import com.example.swd.dao.Region;
 @Controller
 @RequestMapping("/s04")
 public class PlainRegionCrudCtr {
-    private static final Logger log = LogManager.getLogger(PlainRegionCrudCtr.class);
+	private static final Logger log = LogManager.getLogger(PlainRegionCrudCtr.class);
 
-    private PlainRegionCrudRepo repo;
+	private PlainRegionCrudRepo repo;
 
-    public PlainRegionCrudCtr(PlainRegionCrudRepo repo) {
-        this.repo = repo;
-    }
+	public PlainRegionCrudCtr(PlainRegionCrudRepo repo) {
+		this.repo = repo;
+	}
 
-    @GetMapping("/create")
-    public String create(@RequestParam String name, Model model) {
-        log.traceEntry("create");
+	@GetMapping("/create")
+	public String create(@RequestParam String name, Model model) {
+		log.traceEntry("create");
 
-        try {
-            Region entity = repo.save(new Region(name));
-            model.addAttribute("message", "Created: " + entity);
-        } catch (Exception ex) {
-            log.warn("Can't persist {}", name);
-            model.addAttribute("message", "Entity _not_ created!");
-        }
+		try {
+			Region entity = repo.save(new Region(name));
+			model.addAttribute("message", "Created: " + entity);
+		} catch (Exception ex) {
+			log.warn("Can't persist {}", name);
+			model.addAttribute("message", "Entity _not_ created!");
+		}
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/rename")
-    public String rename(@RequestParam Integer id, @RequestParam String name, Model model) {
-        log.traceEntry("rename");
+	@GetMapping("/rename")
+	public String rename(@RequestParam Integer id, @RequestParam String name, Model model) {
+		log.traceEntry("rename");
 
-        repo.findById(id).ifPresentOrElse(entity -> {
-            entity.setName(name);
-            Region edited = repo.save(entity);
-            model.addAttribute("message", "Saved: " + edited);
-        }, () -> model.addAttribute("message", "No entity found with id " + id));
+		repo.findById(id).ifPresentOrElse(entity -> {
+			entity.setName(name);
+			Region edited = repo.save(entity);
+			model.addAttribute("message", "Saved: " + edited);
+		}, () -> model.addAttribute("message", "No entity found with id " + id));
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/check")
-    public String check(@RequestParam Integer id, Model model) {
-        log.traceEntry("check");
-
+	@GetMapping("/check")
+	public String check(@RequestParam Integer id, Model model) {
+		log.traceEntry("check");
+//		boolean isPresent = repo.existsById(id);
+//		String message = "Entity " + id;
+//		if (isPresent) {
+//			message += " found";
+//		} else {
+//			message += " NOT found";
+//		}
+//		model.addAttribute("message", message);
         model.addAttribute("message", String.format("Entity %d %sfound", id, repo.existsById(id) ? "" : "NOT "));
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/all")
-    public String all(Model model) {
-        log.traceEntry("all");
+	@GetMapping("/all")
+	public String all(Model model) {
+		log.traceEntry("all");
 
-        model.addAttribute("message", "Found: " + repo.findAll());
+		model.addAttribute("message", "Found: " + repo.findAll());
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/some")
-    public String some(@RequestParam List<Integer> ids, Model model) {
-        log.traceEntry("some");
+	@GetMapping("/some")
+	public String some(@RequestParam List<Integer> ids, Model model) {
+		log.traceEntry("some");
 
-        model.addAttribute("message", "Found: " + repo.findAllById(ids));
+		model.addAttribute("message", "Found: " + repo.findAllById(ids));
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/count")
-    public String count(Model model) {
-        log.traceEntry("count");
+	@GetMapping("/count")
+	public String count(Model model) {
+		log.traceEntry("count");
 
-        model.addAttribute("message", String.format("Found %d entities", repo.count()));
+		model.addAttribute("message", String.format("Found %d entities", repo.count()));
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/deleteById")
-    public String deleteById(@RequestParam Integer id, Model model) {
-        log.traceEntry("deleteById");
+	@GetMapping("/deleteById")
+	public String deleteById(@RequestParam Integer id, Model model) {
+		log.traceEntry("deleteById");
 
-        try {
-            repo.deleteById(id);
-            return "redirect:/s04/check?id=" + id;
-        } catch (Exception ex) {
-            model.addAttribute("message", "Can't delete entity " + id);
-            return "/s04/result";
-        }
-    }
+		try {
+			repo.deleteById(id);
+			return "redirect:/s04/check?id=" + id;
+		} catch (Exception ex) {
+			model.addAttribute("message", "Can't delete entity " + id);
+			return "/s04/result";
+		}
+	}
 
-    @GetMapping("/delete")
-    public String delete(@RequestParam Integer id, Model model) {
-        log.traceEntry("delete");
+	@GetMapping("/delete")
+	public String delete(@RequestParam Integer id, Model model) {
+		log.traceEntry("delete");
 
-        Optional<Region> opt = repo.findById(id);
-        if (opt.isPresent()) {
-            try {
-                repo.delete(opt.get());
-                return "redirect:/s04/check?id=" + id;
-            } catch (Exception ex) {
-                log.warn("Can't delete entity " + id);
-            }
-        }
+		Optional<Region> opt = repo.findById(id);
+		if (opt.isPresent()) {
+			try {
+				repo.delete(opt.get());
+				return "redirect:/s04/check?id=" + id;
+			} catch (Exception ex) {
+				log.warn("Can't delete entity " + id);
+			}
+		}
 
-        model.addAttribute("message", "Can't delete entity " + id);
-        return "/s04/result";
-    }
+		model.addAttribute("message", "Can't delete entity " + id);
+		return "/s04/result";
+	}
 
-    @GetMapping("/deleteSome")
-    public String deleteSome(@RequestParam List<Integer> ids, Model model) {
-        log.traceEntry("deleteSome");
+	@GetMapping("/deleteSome")
+	public String deleteSome(@RequestParam List<Integer> ids, Model model) {
+		log.traceEntry("deleteSome");
 
-        List<Region> regions = new ArrayList<>();
-        ids.forEach(id -> repo.findById(id).ifPresent(entity -> regions.add(entity)));
+		List<Region> regions = new ArrayList<>();
+		ids.forEach(id -> repo.findById(id).ifPresent(entity -> regions.add(entity)));
 
-        repo.deleteAll(regions);
+		repo.deleteAll(regions);
 
-        model.addAttribute("message", "To be deleted: " + regions);
+		model.addAttribute("message", "To be deleted: " + regions);
 
-        return "/s04/result";
-    }
+		return "/s04/result";
+	}
 
-    @GetMapping("/deleteAll")
-    public String deleteAll(Model model) {
-        log.traceEntry("deleteAll");
+	@GetMapping("/deleteAll")
+	public String deleteAll(Model model) {
+		log.traceEntry("deleteAll");
 
-        repo.deleteAll();
+		repo.deleteAll();
 
-        return "redirect:/s04/count";
-    }
+		return "redirect:/s04/count";
+	}
 }
